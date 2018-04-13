@@ -36,6 +36,29 @@ public:
 	void end_serialize_complex_array(const char* name) override;
 	void print() override;
 
+	void deserialize(const char* name, int8_t& value) override;
+	void deserialize(const char* name, uint8_t& value) override;
+	void deserialize(const char* name, int16_t& value) override;
+	void deserialize(const char* name, uint16_t& value) override;
+	void deserialize(const char* name, int32_t& value) override;
+	void deserialize(const char* name, uint32_t& value) override;
+	void deserialize(const char* name, float& value) override;
+	void deserialize(const char* name, double& value) override;
+	void deserialize(const char* name, int8_t** value, bool is_static = true) override;
+	void deserialize(const char* name, uint8_t** value, bool is_static = true) override;
+	void deserialize(const char* name, int16_t** value, bool is_static = true) override;
+	void deserialize(const char* name, uint16_t** value, bool is_static = true) override;
+	void deserialize(const char* name, int32_t** value, bool is_static = true) override;
+	void deserialize(const char* name, uint32_t** value, bool is_static = true) override;
+	void deserialize(const char* name, float** value, bool is_static = true) override;
+	void deserialize(const char* name, double** value, bool is_static = true) override;
+	void deserialize(const char* name, std::string& value, bool is_static = true) override;
+	void deserialize(const char* name, char** value, bool is_static = true) override;
+	void begin_deserialize_complex(const char* name, int index = -1) override;
+	void end_deserialize_complex(const char* name) override;
+	int  begin_deserialize_complex_array(const char* name) override;
+	void end_deserialize_complex_array(const char* name) override;
+
 private:
 	std::stack<nlohmann::json> m_object_stack;
 };

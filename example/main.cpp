@@ -1,19 +1,27 @@
 #include <iostream>
 #include <json_serializer.hpp>
 
-struct TestB
+class TestB
 {
+public:
 	float a;
 	std::string b;
 	int c;
-};
 
-void serialize_test_b(ISerializer* serializer, TestB& obj)
-{
-	serializer->serialize("a", obj.a);
-	serializer->serialize("b", obj.b);
-	serializer->serialize("c", obj.c);
-}
+	static void serialize_test_b(ISerializer* serializer, TestB& obj)
+	{
+		serializer->serialize("a", obj.a);
+		serializer->serialize("b", obj.b);
+		serializer->serialize("c", obj.c);
+	}
+
+	static void deserialize_test_b(ISerializer* serializer, TestB& obj)
+	{
+		serializer->deserialize("a", obj.a);
+		serializer->deserialize("b", obj.b);
+		serializer->deserialize("c", obj.c);
+	}
+};
 
 struct TestA
 {
@@ -29,8 +37,17 @@ void serialize(ISerializer* serializer, TestA& obj)
 	serializer->serialize("a", obj.a);
 	serializer->serialize("b", obj.b);
 	serializer->serialize("c", obj.c);
-	serializer->serialize_complex("d", obj.d, &serialize_test_b);
-	serializer->serialize_complex_array("e", &obj.e[0], 10, &serialize_test_b);
+	serializer->serialize_complex("d", obj.d, &TestB::serialize_test_b);
+	serializer->serialize_complex_array("e", &obj.e[0], 10, &TestB::serialize_test_b);
+}
+
+void deserialize(ISerializer* serializer, TestA& obj)
+{
+	serializer->deserialize("a", obj.a);
+	serializer->deserialize("b", obj.b);
+	serializer->deserialize("c", obj.c);
+	serializer->deserialize_complex("d", obj.d, &TestB::deserialize_test_b);
+	serializer->deserialize_complex_array("e", &obj.e[0], &TestB::deserialize_test_b);
 }
 
 int main()
@@ -61,6 +78,10 @@ int main()
 	serialize(&serializer, obj);
 
 	serializer.print();
+
+	TestA deserialize_test;
+
+	deserialize(&serializer, deserialize_test);
 
 	std::cin.get();
     return 0;
