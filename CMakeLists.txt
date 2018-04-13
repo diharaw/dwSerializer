@@ -14,7 +14,7 @@ project("dwSerializer")
 set(DW_INCLUDE_PATH "${PROJECT_SOURCE_DIR}/include")
 
 # Setup external include paths
-set(JSON_INCLUDE_PATH "${PROJECT_SOURCE_DIR}/external/json/src")
+set(JSON_INCLUDE_PATH "${PROJECT_SOURCE_DIR}/external/json/single_include/nlohmann")
 set(TINYXML2_INCLUDE_PATH "${PROJECT_SOURCE_DIR}/external/tinyxml2")
 
 # Set includes

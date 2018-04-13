@@ -1,6 +1,8 @@
 #include <iostream>
 
 #include <serializer.hpp>
+#include <json_serializer.hpp>
+#include <xml_serializer.hpp>
 
 #define NUM_INNER_ARRAY 10
 
