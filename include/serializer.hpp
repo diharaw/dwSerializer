@@ -28,31 +28,43 @@ public:
 	virtual void serialize(const char* name, const char* value)				 = 0;
 	virtual void begin_serialize_complex(const char* name)					 = 0;
 	virtual void end_serialize_complex(const char* name)					 = 0;
-	virtual void begin_serialize_complex_array(const char* name, int count)	 = 0;
+	virtual void begin_serialize_complex_array(const char* name, int count)  = 0;
 	virtual void end_serialize_complex_array(const char* name)				 = 0;
 	virtual void print()													 = 0;
+	virtual bool is_raw_serializable() = 0;
+	virtual void raw_serialize(void* data, const size_t& size) = 0;
 
 	template <typename T>
-	void serialize_complex(const char* name, T& value, void (*serialize_func)(ISerializer*, T&))
+	void serialize_complex(const char* name, T& value, void (*serialize_func)(ISerializer*, T&), bool raw)
 	{
-		begin_serialize_complex(name);
-		(*serialize_func)(this, value);
-		end_serialize_complex(name);
+		if (raw && is_raw_serializable())
+			raw_serialize(&value, sizeof(T));
+		else
+		{
+			begin_serialize_complex(name);
+			(*serialize_func)(this, value);
+			end_serialize_complex(name);
+		}
 	}
 
 	template <typename T>
-	void serialize_complex_array(const char* name, T* value, int count, void(*serialize_func)(ISerializer*, T&))
+	void serialize_complex_array(const char* name, T* value, int count, void(*serialize_func)(ISerializer*, T&), bool raw)
 	{
-		begin_serialize_complex_array(name, count);
-
-		for (int i = 0; i < count; i++)
+		if (raw && is_raw_serializable())
+			raw_serialize(value, sizeof(T) * count);
+		else
 		{
-			begin_serialize_complex(name);
-			(*serialize_func)(this, value[i]);
-			end_serialize_complex(name);
-		}
+			begin_serialize_complex_array(name, count)
 
-		end_serialize_complex_array(name);
+			for (int i = 0; i < count; i++)
+			{
+				begin_serialize_complex(name);
+				(*serialize_func)(this, value[i]);
+				end_serialize_complex(name);
+			}
+
+			end_serialize_complex_array(name);
+		}
 	}
 
 	virtual void deserialize(const char* name, int8_t& value) = 0;

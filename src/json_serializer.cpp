@@ -165,6 +165,17 @@ void JsonSerializer::serialize(const char* name, const char* value)
 	m_object_stack.top()[name] = value;
 }
 
+bool JsonSerializer::is_raw_serializable()
+{
+	return false;
+}
+
+void JsonSerializer::raw_serialize(void* data, const size_t& size)
+{
+	// NOT ALLOWED.
+	assert(false);
+}
+
 void JsonSerializer::begin_serialize_complex(const char* name)
 {
 	m_object_stack.push(nlohmann::json());

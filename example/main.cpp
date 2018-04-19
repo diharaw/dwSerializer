@@ -1,5 +1,6 @@
 #include <iostream>
 #include <json_serializer.hpp>
+#include <binary_serializer.hpp>
 
 class TestB
 {

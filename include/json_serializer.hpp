@@ -35,6 +35,8 @@ public:
 	void begin_serialize_complex_array(const char* name, int count) override;
 	void end_serialize_complex_array(const char* name) override;
 	void print() override;
+	bool is_raw_serializable() override;
+	void raw_serialize(void* data, const size_t& size) override;
 
 	void deserialize(const char* name, int8_t& value) override;
 	void deserialize(const char* name, uint8_t& value) override;
