@@ -9,18 +9,18 @@ public:
 	std::string b;
 	int c;
 
-	static void serialize_test_b(ISerializer* serializer, TestB& obj)
+	void serialize(ISerializer* serializer)
 	{
-		serializer->serialize("a", obj.a);
-		serializer->serialize("b", obj.b);
-		serializer->serialize("c", obj.c);
+		serializer->serialize("a", a);
+		serializer->serialize("b", b);
+		serializer->serialize("c", c);
 	}
 
-	static void deserialize_test_b(ISerializer* serializer, TestB& obj)
+	void deserialize(ISerializer* serializer)
 	{
-		serializer->deserialize("a", obj.a);
-		serializer->deserialize("b", obj.b);
-		serializer->deserialize("c", obj.c);
+		serializer->deserialize("a", a);
+		serializer->deserialize("b", b);
+		serializer->deserialize("c", c);
 	}
 };
 
@@ -31,25 +31,25 @@ struct TestA
 	int c;
 	TestB d;
 	TestB e[10];
+
+	void serialize(ISerializer* serializer)
+	{
+		serializer->serialize("a", a);
+		serializer->serialize("b", b);
+		serializer->serialize("c", c);
+		serializer->serialize_complex("d", d, false);
+		serializer->serialize_complex_array("e", &e[0], 10, false);
+	}
+
+	void deserialize(ISerializer* serializer)
+	{
+		serializer->deserialize("a", a);
+		serializer->deserialize("b", b);
+		serializer->deserialize("c", c);
+		serializer->deserialize_complex("d", d, false);
+		serializer->deserialize_complex_array("e", &e[0], false);
+	}
 };
-
-void serialize(ISerializer* serializer, TestA& obj)
-{
-	serializer->serialize("a", obj.a);
-	serializer->serialize("b", obj.b);
-	serializer->serialize("c", obj.c);
-	serializer->serialize_complex("d", obj.d, &TestB::serialize_test_b);
-	serializer->serialize_complex_array("e", &obj.e[0], 10, &TestB::serialize_test_b);
-}
-
-void deserialize(ISerializer* serializer, TestA& obj)
-{
-	serializer->deserialize("a", obj.a);
-	serializer->deserialize("b", obj.b);
-	serializer->deserialize("c", obj.c);
-	serializer->deserialize_complex("d", obj.d, &TestB::deserialize_test_b);
-	serializer->deserialize_complex_array("e", &obj.e[0], &TestB::deserialize_test_b);
-}
 
 int main()
 {
@@ -76,13 +76,13 @@ int main()
 		obj.e[i].c = rand();
 	}
 
-	serialize(&serializer, obj);
+	obj.serialize(&serializer);
 
 	serializer.print();
 
 	TestA deserialize_test;
 
-	deserialize(&serializer, deserialize_test);
+	deserialize_test.deserialize(&serializer);
 
 	std::cin.get();
     return 0;

@@ -35,31 +35,31 @@ public:
 	virtual void raw_serialize(void* data, const size_t& size) = 0;
 
 	template <typename T>
-	void serialize_complex(const char* name, T& value, void (*serialize_func)(ISerializer*, T&), bool raw)
+	void serialize_complex(const char* name, T& value, bool raw)
 	{
 		if (raw && is_raw_serializable())
 			raw_serialize(&value, sizeof(T));
 		else
 		{
 			begin_serialize_complex(name);
-			(*serialize_func)(this, value);
+			value.serialize(this);
 			end_serialize_complex(name);
 		}
 	}
 
 	template <typename T>
-	void serialize_complex_array(const char* name, T* value, int count, void(*serialize_func)(ISerializer*, T&), bool raw)
+	void serialize_complex_array(const char* name, T* value, int count, bool raw)
 	{
 		if (raw && is_raw_serializable())
 			raw_serialize(value, sizeof(T) * count);
 		else
 		{
-			begin_serialize_complex_array(name, count)
+			begin_serialize_complex_array(name, count);
 
 			for (int i = 0; i < count; i++)
 			{
 				begin_serialize_complex(name);
-				(*serialize_func)(this, value[i]);
+				value[i].serialize(this);
 				end_serialize_complex(name);
 			}
 
@@ -89,43 +89,59 @@ public:
 	virtual void end_deserialize_complex(const char* name) = 0;
 	virtual int  begin_deserialize_complex_array(const char* name) = 0;
 	virtual void end_deserialize_complex_array(const char* name) = 0;
+	virtual void raw_deserialize(void* data, const size_t& size) = 0;
 
 	template <typename T>
-	void deserialize_complex(const char* name, T& value, void(*deserialize_func)(ISerializer*, T&))
+	void deserialize_complex(const char* name, T& value, bool raw)
 	{
-		begin_deserialize_complex(name);
-		(*deserialize_func)(this, value);
-		end_deserialize_complex(name);
+		if (raw && is_raw_serializable())
+			raw_deserialize(&value, sizeof(T));
+		else
+		{
+			begin_deserialize_complex(name);
+			value.deserialize(this);
+			end_deserialize_complex(name);
+		}
 	}
 
 	template <typename T>
-	void deserialize_complex_array(const char* name, T* value, void(*deserialize_func)(ISerializer*, T&))
+	void deserialize_complex_array(const char* name, T* value, bool raw)
 	{
 		int size = begin_deserialize_complex_array(name);
 
-		for (int i = 0; i < size; i++)
+		if (raw && is_raw_serializable())
+			raw_deserialize(value, sizeof(T) * size);
+		else
 		{
-			begin_deserialize_complex(name, i);
-			(*deserialize_func)(this, value[i]);
-			end_deserialize_complex(name);
-		}
+			for (int i = 0; i < size; i++)
+			{
+				begin_deserialize_complex(name, i);
+				value[i].deserialize(this);
+				end_deserialize_complex(name);
+			}
 
-		end_deserialize_complex_array(name);
+			end_deserialize_complex_array(name);
+		}
 	}
 
 	template <typename T>
-	void deserialize_complex_array(const char* name, T** value, void(*deserialize_func)(ISerializer*, T&))
+	void deserialize_complex_array(const char* name, T** value, bool raw)
 	{
 		int size = begin_deserialize_complex_array(name);
 		*value = new T[size];
 
-		for (int i = 0; i < size; i++)
+		if (raw && is_raw_serializable())
+			raw_deserialize(value, sizeof(T) * size);
+		else
 		{
-			begin_deserialize_complex(name, i);
-			(*deserialize_func)(this, *value[i]);
-			end_deserialize_complex(name);
-		}
+			for (int i = 0; i < size; i++)
+			{
+				begin_deserialize_complex(name, i);
+				*value[i].deserialize(this);
+				end_deserialize_complex(name);
+			}
 
-		end_deserialize_complex_array(name);
+			end_deserialize_complex_array(name);
+		}
 	}
 };

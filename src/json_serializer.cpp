@@ -409,3 +409,8 @@ void JsonSerializer::end_deserialize_complex_array(const char* name)
 {
 	m_object_stack.pop();
 }
+
+void JsonSerializer::raw_deserialize(void* data, const size_t& size)
+{
+
+}

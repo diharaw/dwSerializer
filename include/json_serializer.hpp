@@ -60,6 +60,7 @@ public:
 	void end_deserialize_complex(const char* name) override;
 	int  begin_deserialize_complex_array(const char* name) override;
 	void end_deserialize_complex_array(const char* name) override;
+	void raw_deserialize(void* data, const size_t& size) override;
 
 private:
 	std::stack<nlohmann::json> m_object_stack;
