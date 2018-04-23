@@ -11,6 +11,11 @@ JsonSerializer::~JsonSerializer()
 
 }
 
+void JsonSerializer::serialize(const char* name, bool& value)
+{
+	m_object_stack.top()[name] = value;
+}
+
 void JsonSerializer::serialize(const char* name, int8_t& value)
 {
 	m_object_stack.top()[name] = value;
@@ -215,6 +220,11 @@ void JsonSerializer::end_serialize_complex_array(const char* name)
 void JsonSerializer::print()
 {
 	std::cout << m_object_stack.top().dump(4) << std::endl;
+}
+
+void JsonSerializer::deserialize(const char* name, bool& value)
+{
+	value = m_object_stack.top()[name];
 }
 
 void JsonSerializer::deserialize(const char* name, int8_t& value)

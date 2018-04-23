@@ -51,38 +51,71 @@ struct TestA
 	}
 };
 
+enum ShadowMapping
+{
+	PCF = 0,
+	PCSS = 1,
+	PSSM = 2
+};
+
+DECLARE_ENUM_TYPE_DESC(ShadowMapping)
+
+struct Bar
+{
+	int msaa;
+	ShadowMapping shadows;
+
+	REFLECT()
+};
+
+struct Foo
+{
+	bool hdr;
+	int level;
+	float bloom_intensity;
+	Bar bar;
+
+	REFLECT()
+};
+
+BEGIN_ENUM_TYPE_DESC(ShadowMapping)
+	REFLECT_ENUM_CONST(PCF, "Percentage Closer Filtering", "PCF")
+	REFLECT_ENUM_CONST(PCSS, "Percentage Closer Soft Shadows", "PCSS")
+	REFLECT_ENUM_CONST(PSSM, "Parallel Split Shadow Maps", "PSSM")
+END_ENUM_TYPE_DESC()
+
+BEGIN_DECLARE_REFLECT(Bar)
+	REFLECT_MEMBER(msaa)
+	REFLECT_MEMBER(shadows)
+END_DECLARE_REFLECT()
+
+BEGIN_DECLARE_REFLECT(Foo)
+	REFLECT_MEMBER(hdr)
+	REFLECT_MEMBER(level)
+	REFLECT_MEMBER(bloom_intensity)
+	REFLECT_MEMBER(bar)
+END_DECLARE_REFLECT()
+
 int main()
 {
 	JsonSerializer serializer;
-	TestA obj;
+	Foo test;
 
-	TestB obj_b;
+	test.bloom_intensity = 3.4f;
+	test.hdr = true;
+	test.level = 5;
+	test.bar.msaa = 4;
+	test.bar.shadows = PCSS;
 
-	obj_b.a = 75.4f;
-	obj_b.b = "Hello Complex Object";
-	obj_b.c = 54;
-
-	obj.a = 43.43f;
-	obj.b = "Hello JSON";
-	obj.c = 42;
-	obj.d = obj_b;
-
-	for (int i = 0; i < 10; i++)
-	{
-		obj.e[i].a = rand();
-		std::string str = "This is a random string ";
-		str += std::to_string(rand());
-		obj.e[i].b = str;
-		obj.e[i].c = rand();
-	}
-
-	obj.serialize(&serializer);
+	serializer.save(test);
 
 	serializer.print();
 
-	TestA deserialize_test;
+	Foo test2;
 
-	deserialize_test.deserialize(&serializer);
+	serializer.load(test2);
+
+	std::cout << test2.bloom_intensity << std::endl;
 
 	std::cin.get();
     return 0;
